@@ -4,8 +4,16 @@ apply plugin: 'com.jfrog.bintray'
 def siteUrl = 'https://github.com/benxiaohai123558/lib_utils'                        // project homepage
 def gitUrl = 'https://github.com/benxiaohai123558/lib_utils.git'                     // project git
 
-group = "com.lucy"                                                             // Maven Group ID for the artifact (pageckage name is ok)
-version = "1.0.0"                                                              // project version
+Properties properties = new Properties()
+properties.load(project.rootProject.file('local.properties').newDataInputStream())
+def bintray_name = properties.getProperty("bintray.name")
+def bintray_id = properties.getProperty("bintray.id")
+def bintray_email = properties.getProperty("bintray.email")
+def bintray_user = properties.getProperty("bintray.user")
+def bintray_key = properties.getProperty("bintray.apikey")
+
+group = "${lib_group}"                                                             // Maven Group ID for the artifact (pageckage name is ok)
+version = "${lib_utils_version}"                                                              // project version
 
 install {
     repositories.mavenInstaller {
@@ -23,9 +31,9 @@ install {
                 }
                 developers {
                     developer {
-                        id 'liucj0318' // your user id (you can write your nickname)
-                        name 'liucj0318'  // your user name
-                        email 'baiduxiaoqiang@126.com' // your email
+                        id bintray_id // your user id (you can write your nickname)
+                        name bintray_name  // your user name
+                        email bintray_email // your email
                     }
                 }
                 scm {
@@ -58,16 +66,14 @@ artifacts {
     archives sourcesJar
 }
 
-Properties properties = new Properties()
-properties.load(project.rootProject.file('local.properties').newDataInputStream())
 
 bintray {
-    user = properties.getProperty("bintray.user")
-    key = properties.getProperty("bintray.apikey")
+    user = bintray_user
+    key = bintray_key
     configurations = ['archives']
     pkg {
         repo = "maven" //跟上面创建的Maven仓库名字保持一致
-        name = "lib_utils" //发布到JCenter上的项目名字
+        name = "${lib_utils_name}" //发布到JCenter上的项目名字
         websiteUrl = siteUrl
         vcsUrl = gitUrl
         licenses = ["Apache-2.0"]//不能随便写，只能是仓库创建时选择的license type

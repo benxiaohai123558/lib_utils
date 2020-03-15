@@ -1,5 +1,19 @@
 apply from: '../lib-default.gradle'
 
+apply plugin: 'com.github.dcendents.android-maven'
+apply plugin: 'com.jfrog.bintray'
+
+def siteUrl = 'https://github.com/benxiaohai123558/lib_utils'                        // project homepage
+def gitUrl = 'https://github.com/benxiaohai123558/lib_utils.git'                     // project git
+
+Properties properties = new Properties()
+properties.load(project.rootProject.file('local.properties').newDataInputStream())
+def bintray_name = properties.getProperty("bintray.name")
+def bintray_id = properties.getProperty("bintray.id")
+def bintray_email = properties.getProperty("bintray.email")
+def bintray_user = properties.getProperty("bintray.user")
+def bintray_key = properties.getProperty("bintray.apikey")
+
 // 库依赖
 def libs = rootProject.ext.dependencies
 
@@ -12,4 +26,74 @@ dependencies {
     api libs["typeface"]
     kapt libs["arouter-compiler"]
     testImplementation libs["test_mockwebserver"]
+}
+
+group = "${lib_group}"                                                             // Maven Group ID for the artifact (pageckage name is ok)
+version = "${lib_root_version}"                                                              // project version
+
+install {
+    repositories.mavenInstaller {
+        // This generates POM.xml with proper parameters
+        pom {
+            project {
+                packaging 'aar'
+                name 'Lucy Lib For Android' // project title
+                url siteUrl // Set your license
+                licenses {
+                    license {
+                        name 'The Apache Software License, Version 2.0'
+                        url 'http://www.apache.org/licenses/LICENSE-2.0.txt'
+                    }
+                }
+                developers {
+                    developer {
+                        id bintray_id // your user id (you can write your nickname)
+                        name bintray_name  // your user name
+                        email bintray_email // your email
+                    }
+                }
+                scm {
+                    connection gitUrl
+                    developerConnection gitUrl
+                    url siteUrl
+                }
+            }
+        }
+    }
+}
+
+task sourcesJar(type: Jar) {
+    from android.sourceSets.main.java.srcDirs
+    classifier = 'sources'
+}
+
+task javadoc(type: Javadoc) {
+    source = android.sourceSets.main.java.srcDirs
+    classpath += project.files(android.getBootClasspath().join(File.pathSeparator))
+}
+
+task javadocJar(type: Jar, dependsOn: javadoc) {
+    classifier = 'javadoc'
+    from javadoc.destinationDir
+}
+
+artifacts {
+    // archives javadocJar
+    archives sourcesJar
+}
+
+
+bintray {
+    user = bintray_user
+    key = bintray_key
+    configurations = ['archives']
+    pkg {
+        repo = "maven" //跟上面创建的Maven仓库名字保持一致
+        name = "${lib_root_name}" //发布到JCenter上的项目名字
+        websiteUrl = siteUrl
+        vcsUrl = gitUrl
+        licenses = ["Apache-2.0"]//不能随便写，只能是仓库创建时选择的license type
+//        userOrg = 'benxiaohai' //自己创建的organization名称，一定要全是小写字母，即使当时创建的名称含有大写，这里全部转换为小写，否则404
+        publish = true
+    }
 }
