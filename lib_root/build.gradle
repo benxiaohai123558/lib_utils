@@ -1,0 +1,15 @@
+apply from: '../lib-default.gradle'
+
+// 库依赖
+def libs = rootProject.ext.dependencies
+
+dependencies {
+    api libs["rxjava"]
+    api libs["rxandroid"]
+    api libs["eventbus"]
+    api libs["arouter-api"]
+    api libs["gson"]
+    api libs["typeface"]
+    kapt libs["arouter-compiler"]
+    testImplementation libs["test_mockwebserver"]
+}

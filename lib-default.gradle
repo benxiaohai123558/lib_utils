@@ -1,0 +1,75 @@
+apply plugin: 'com.android.library'
+apply plugin: 'kotlin-android'
+apply plugin: 'kotlin-android-extensions'
+apply plugin: 'kotlin-kapt'
+
+// 库依赖
+def libs = rootProject.ext.dependencies
+def cfg = rootProject.ext.android
+
+android {
+    compileSdkVersion cfg.compileSdkVersion
+    buildToolsVersion cfg.buildToolsVersion
+
+    defaultConfig {
+        minSdkVersion cfg.minSdkVersion
+        targetSdkVersion cfg.targetSdkVersion
+        versionCode cfg.versionCode
+        versionName cfg.versionName
+
+        kapt {
+            arguments {
+                arg("moduleName", project.getName())
+            }
+        }
+
+        //将混淆文件打包到aar中的方法
+        consumerProguardFiles 'consumer-rules.pro'
+        testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+    }
+
+    lintOptions {
+        checkReleaseBuilds false
+        abortOnError false
+    }
+
+    buildTypes {
+        debug {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+        }
+
+        release {
+            minifyEnabled true
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+        }
+    }
+
+    androidExtensions {
+        experimental = true
+    }
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
+}
+
+dependencies {
+    implementation fileTree(include: ['*.jar'], dir: 'libs')
+    implementation libs["appcompat-v7"]
+    implementation libs["kotlin"]
+    implementation libs["anko-commons"]
+
+    testImplementation libs["test-junit"]
+    androidTestImplementation libs["test-runner"]
+    androidTestImplementation libs["test-espresso"]
+}
+
+//aar库更新时间
+//configurations.all {
+//    resolutionStrategy.cacheDynamicVersionsFor 0, 'minutes'
+//    resolutionStrategy.cacheChangingModulesFor 0, 'minutes'
+//}
+
+

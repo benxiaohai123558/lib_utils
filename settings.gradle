@@ -1,0 +1,2 @@
+rootProject.name='TestLib'
+include ':app', ':lib_utils', ':lib_root'

@@ -1,0 +1,9 @@
+apply from: '../lib-default.gradle'
+apply from: '../upload-archives.gradle'
+
+// 库依赖
+def libs = rootProject.ext.dependencies
+
+dependencies {
+    api libs["gson"]
+}
